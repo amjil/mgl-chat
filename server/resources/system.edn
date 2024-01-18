@@ -50,6 +50,6 @@
  :db.sql/migrations {:store :database,
                      :db {:datasource #ig/ref :db.sql/connection},
                      :migrate-on-init? true}
- :db.sql/connection #profile {:dev {:jdbc-url "jdbc:sqlite:mgl-chat_dev.db"},
-                              :test {:jdbc-url "jdbc:sqlite:mgl-chat_test.db"},
+ :db.sql/connection #profile {:dev {:jdbc-url "jdbc:postgresql://localhost:5432/chat_dev?user=appuser&password=appuer"},
+                              :test {:jdbc-url "jdbc:postgresql://localhost:5432/chat_dev?user=appuser&password=appuer"},
                               :prod {:jdbc-url #env JDBC_URL}}}
