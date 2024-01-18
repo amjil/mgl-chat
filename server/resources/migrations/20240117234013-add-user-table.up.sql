@@ -1,6 +1,7 @@
 CREATE TABLE users (
     "id" uuid DEFAULT uuid_generate_v4 () primary key,
     username text,
+    screen_name text,
     mobile text,
     email text,
     encrypted_password text,
