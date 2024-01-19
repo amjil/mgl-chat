@@ -10,6 +10,7 @@
            metosin/ring-http-response {:mvn/version "0.9.3"}
            ring/ring-core {:mvn/version "1.10.0"}
            ring/ring-defaults {:mvn/version "0.3.4"}
+           ring-logger/ring-logger {:mvn/version "1.1.1"}
 
            ;; Logging
            ch.qos.logback/logback-classic {:mvn/version "1.4.11"}
@@ -23,11 +24,13 @@
            io.github.kit-clj/kit-core {:mvn/version "1.0.6"}
            io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
            io.github.kit-clj/kit-sql-conman {:mvn/version "1.0.5"}
-           io.github.kit-clj/kit-sql-migratus {:mvn/version"1.0.2"}
-           
+           io.github.kit-clj/kit-sql-migratus {:mvn/version "1.0.2"}
+
            ;; DB
            org.postgresql/postgresql {:mvn/version "42.3.4"}
-           org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}}
+           org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}
+           hiccup/hiccup {:mvn/version "2.0.0-alpha2"}
+           buddy/buddy-auth {:mvn/version "3.0.323"}}
  :aliases {:build {:deps {io.github.clojure/tools.build {:git/sha "24f2894"
                                                          :git/tag "v0.9.5" :git/url "https://github.com/clojure/tools.build.git"}}
                    :ns-default build}

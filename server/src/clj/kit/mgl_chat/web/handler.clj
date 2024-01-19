@@ -1,10 +1,11 @@
 (ns kit.mgl-chat.web.handler
   (:require
-    [kit.mgl-chat.web.middleware.core :as middleware]
-    [integrant.core :as ig]
-    [ring.util.http-response :as http-response]
-    [reitit.ring :as ring]
-    [reitit.swagger-ui :as swagger-ui]))
+   [kit.mgl-chat.web.middleware.core :as middleware]
+   [kit.mgl-chat.web.middleware.auth :as auth-middleware]
+   [integrant.core :as ig]
+   [ring.util.http-response :as http-response]
+   [reitit.ring :as ring]
+   [reitit.swagger-ui :as swagger-ui]))
 
 (defmethod ig/init-key :handler/ring
   [_ {:keys [router api-path] :as opts}]
@@ -28,7 +29,8 @@
        :not-acceptable
        (constantly (-> {:status 406, :body "Not acceptable"}
                        (http-response/content-type "text/html")))}))
-    {:middleware [(middleware/wrap-base opts)]}))
+    {:middleware [(middleware/wrap-base opts)
+                  (auth-middleware/wrap-auth opts)]}))
 
 (defmethod ig/init-key :router/routes
   [_ {:keys [routes]}]
