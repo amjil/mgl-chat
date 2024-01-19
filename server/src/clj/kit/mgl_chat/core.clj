@@ -13,7 +13,8 @@
     [kit.mgl-chat.web.routes.api]
     
     [kit.edge.db.sql.conman] 
-    [kit.edge.db.sql.migratus])
+    [kit.edge.db.sql.migratus] 
+    [kit.mgl-chat.web.routes.ui])
   (:gen-class))
 
 ;; log uncaught exceptions in threads
