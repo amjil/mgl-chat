@@ -15,6 +15,14 @@
   (accessrules/restrict handler {:handler auth/authenticated?
                                  :on-error on-error}))
 
+(defn on-not-signed-in [request _response]
+  {:status 303
+   :headers {"location" "/?error=not-signed-in"}})
+
+(defn wrap-signed-in [handler]
+  (accessrules/restrict handler {:handler auth/authenticated?
+                                 :on-error on-error}))
+
 (defn wrap-auth
   [opts]
   (let [backend (jwe-backend {:secret (hash/sha256 (:token-secret opts))
