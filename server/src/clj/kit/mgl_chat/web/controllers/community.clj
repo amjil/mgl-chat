@@ -28,3 +28,14 @@
    params
    {:id (UUID/fromString id)
     :user_id (UUID/fromString (:id uinfo))}))
+
+(defn query-communities
+  [conn params]
+  (let [limit (or (:limit params) 20)
+        offset (or (:offset params) 0)]
+    (db/find-by-keys
+     conn
+     :communities
+     :all
+     {:order-by [[:created_at :desc]] 
+      :offset offset :fetch limit})))
