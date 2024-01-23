@@ -2,6 +2,7 @@
            "resources"]
 
  :deps    {org.clojure/clojure {:mvn/version "1.11.1"}
+           clojure.java-time/clojure.java-time {:mvn/version "1.4.2"}
 
            ;; Routing
            metosin/reitit {:mvn/version "0.6.0"}
