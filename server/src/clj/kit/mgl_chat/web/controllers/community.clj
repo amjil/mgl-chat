@@ -39,3 +39,11 @@
      :all
      {:order-by [[:created_at :desc]] 
       :offset offset :fetch limit})))
+
+(defn wrap-community 
+  [opts handler]
+  (fn [{{{id :id} :path} :parameters :as ctx}]
+    (if-some [community (db/find-one-by-keys (:db-conn opts) :communities {:id (UUID/fromString id)})]
+      (handler (assoc ctx :community community))
+      {:status 404
+       :body {}})))
