@@ -26,3 +26,10 @@
    :channels
    params
    {:id (UUID/fromString id)}))
+
+(defn query-channels
+  [conn id params]
+  (db/find-by-keys
+   conn
+   :channels
+   (assoc params :comm_id id)))
