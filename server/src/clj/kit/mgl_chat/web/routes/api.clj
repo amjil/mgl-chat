@@ -1,5 +1,9 @@
 (ns kit.mgl-chat.web.routes.api
   (:require
+    [kit.mgl-chat.web.middleware.auth :as auth-middleware]
+    [kit.mgl-chat.web.controllers.community :as community]
+    [kit.mgl-chat.web.controllers.auth :as auth]
+    [kit.mgl-chat.web.controllers.channel :as channel]
     [kit.mgl-chat.web.controllers.health :as health]
     [kit.mgl-chat.web.middleware.exception :as exception]
     [kit.mgl-chat.web.middleware.formats :as formats]
@@ -38,7 +42,39 @@
            :swagger {:info {:title "kit.mgl-chat API"}}
            :handler (swagger/create-swagger-handler)}}]
    ["/health"
-    {:get health/healthcheck!}]])
+    {:get health/healthcheck!}]
+   ["/auth"
+    {:swagger {:tags ["auth"]}}
+    ["/login"
+     {:post {:summary "sign in."
+             :parameters {:body {:email string?
+                                 :password string?}}
+             :responses {200 {:body any?}}
+             :handler (fn [{{:keys [body]} :parameters headers :headers addr :remote-addr}]
+                        {:status 200 :body
+                         (auth/login (:db-conn _opts) (:token-secret _opts) body)})}}]
+    ["/signup"
+     {:post {:summary "sign up."
+             :parameters {:body {:email string?
+                                 :password string?}}
+             :responses {200 {:body {:token string?}}}
+             :handler (fn [{{:keys [body]} :parameters headers :headers addr :remote-addr}]
+                        {:status 200 :body
+                         (auth/signup (:db-conn _opts) (:token-secret _opts) body)})}}]]
+   ["/community" 
+    {:swagger {:tags ["community"]}
+     :post {:summary "new community"
+            :middleware [[auth-middleware/wrap-restricted]]
+            :parameters {:body {:title string?}}
+            :responses {200 {:body any?}}
+            :handler (fn [{{:keys [body]} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (community/new-community (:db-conn _opts)  uinfo body)})}}]
+  ;;  ["/community/:id"
+  ;;   {:swagger {:tags ["community"]}
+  ;;    :middleware [[(partial community/wrap-community _opts)]]}
+  ;;   ]
+   ])
 
 (derive :reitit.routes/api :reitit/routes)
 
