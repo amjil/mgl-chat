@@ -16,6 +16,7 @@ CREATE TABLE users (
     failed_attempts integer DEFAULT 0 NOT NULL,
     unlock_token text,
     locked_at timestamp without time zone,
+    is_admin smallint default 0,
     status smallint DEFAULT 1 NOT NULL,
     level smallint DEFAULT 0 NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
