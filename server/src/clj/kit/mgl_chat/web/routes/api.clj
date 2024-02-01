@@ -64,7 +64,8 @@
    ["/communities" 
     {:swagger {:tags ["community"]}
      :post {:summary "new community"
-            :middleware [[auth-middleware/wrap-restricted]]
+            :middleware [[auth-middleware/wrap-restricted]
+                         [(partial auth-middleware/wrap-is-admin (:db-conn _opts))]]
             :parameters {:body {:title string?}}
             :responses {200 {:body any?}}
             :handler (fn [{{:keys [body]} :parameters uinfo :identity}]
