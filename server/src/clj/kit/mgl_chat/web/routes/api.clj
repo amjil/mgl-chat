@@ -61,7 +61,7 @@
              :handler (fn [{{:keys [body]} :parameters headers :headers addr :remote-addr}]
                         {:status 200 :body
                          (auth/signup (:db-conn _opts) (:token-secret _opts) body)})}}]]
-   ["/community" 
+   ["/communities" 
     {:swagger {:tags ["community"]}
      :post {:summary "new community"
             :middleware [[auth-middleware/wrap-restricted]]
@@ -69,7 +69,13 @@
             :responses {200 {:body any?}}
             :handler (fn [{{:keys [body]} :parameters uinfo :identity}]
                        {:status 200 :body
-                        (community/new-community (:db-conn _opts)  uinfo body)})}}]
+                        (community/new-community (:db-conn _opts)  uinfo body)})}
+     :get {:summary "get communities list"
+           :middleware [[auth-middleware/wrap-restricted]]
+           :parameters {}
+           :responses {200 {:body any?}}
+           :handler (fn [{uinfo :identity}]
+                      (community/query-communities (:query-fn _opts) uinfo))}}]
   ;;  ["/community/:id"
   ;;   {:swagger {:tags ["community"]}
   ;;    :middleware [[(partial community/wrap-community _opts)]]}

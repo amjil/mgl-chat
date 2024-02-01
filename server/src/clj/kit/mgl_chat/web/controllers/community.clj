@@ -29,6 +29,10 @@
    {:id (UUID/fromString id)
     :user_id (UUID/fromString (:id uinfo))}))
 
+(defn query-communities
+  [query-fn uinfo]
+  (query-fn :query-communities {:user_id (UUID/fromString (:id uinfo))}))
+
 (defn wrap-community 
   [opts handler]
   (fn [{{{id :id} :path} :parameters :as ctx}]
