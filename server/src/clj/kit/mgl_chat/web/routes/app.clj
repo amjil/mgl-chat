@@ -1,6 +1,13 @@
 (ns kit.mgl-chat.web.routes.app
   (:require
-   [kit.mgl-chat.web.middleware.core :as middleware]))
+   ))
 
-(defn routes []
-  ["" {:middleware middleware/wrap-restricted}])
+(defn app [ctx]
+  [:p "Select a community, or create a new one."])
+
+(defn routes 
+  [_opts]
+  
+  ;;  ["/community"     {:middleware auth-middleware/wrap-restricted
+  ;;                     :post community/new-community}]
+  )
