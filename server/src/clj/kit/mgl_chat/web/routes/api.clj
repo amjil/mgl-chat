@@ -61,11 +61,10 @@
              :handler (fn [{{:keys [body]} :parameters headers :headers addr :remote-addr}]
                         {:status 200 :body
                          (auth/signup (:db-conn _opts) (:token-secret _opts) body)})}}]]
-   ["/communities" 
+   ["/communities"
     {:swagger {:tags ["community"]}
      :post {:summary "new community"
-            :middleware [[auth-middleware/wrap-restricted]
-                         [(partial auth-middleware/wrap-is-admin (:db-conn _opts))]]
+            :middleware [[auth-middleware/wrap-restricted]]
             :parameters {:body {:title string?}}
             :responses {200 {:body any?}}
             :handler (fn [{{:keys [body]} :parameters uinfo :identity}]
@@ -77,11 +76,16 @@
            :responses {200 {:body any?}}
            :handler (fn [{uinfo :identity}]
                       (community/query-communities (:query-fn _opts) uinfo))}}]
-  ;;  ["/community/:id"
-  ;;   {:swagger {:tags ["community"]}
-  ;;    :middleware [[(partial community/wrap-community _opts)]]}
-  ;;   ]
-   ])
+   ["/communities/:id"
+    {:swagger {:tags ["community"]}
+     :middleware [[(partial community/wrap-community _opts)]]
+     :put {:summary "update community"
+           :middleware [[auth-middleware/wrap-restricted]]
+           :parameters {:body {:title string?}
+                        :path {:id string?}}
+           :responses {200 {:body any?}}
+           :handler (fn [{{{id :id} :path body :body} :parameters uinfo :identity}]
+                      (community/update-community (:query-fn _opts) uinfo id body))}}]])
 
 (derive :reitit.routes/api :reitit/routes)
 
