@@ -91,7 +91,22 @@
               :responses {200 {:body any?}}
               :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                          (community/delete-community (:db-conn _opts) uinfo id))}}]
-   ])
+   ["/communities/:id/channels"
+    {:swagger {:tags ["channels"]}
+     :post {:summary "new channel"
+            :middleware [[auth-middleware/wrap-restricted]]
+            :parameters {:body {:title string?}
+                         :path {:id string?}}
+            :responses {200 {:body any?}}
+            :handler (fn [{{{id :id} :path body :body} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (channel/new-channel (:db-conn _opts) uinfo (assoc body :comm_id id))})}
+     :get {:summary "get channels list"
+           :middleware [[auth-middleware/wrap-restricted]]
+           :parameters {:path {:id string?}}
+           :responses {200 {:body any?}}
+           :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                      (channel/query-channels (:db-conn _opts) id {}))}}]])
 
 (derive :reitit.routes/api :reitit/routes)
 
