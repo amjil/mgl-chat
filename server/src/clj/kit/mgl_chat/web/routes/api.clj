@@ -85,7 +85,13 @@
                         :path {:id string?}}
            :responses {200 {:body any?}}
            :handler (fn [{{{id :id} :path body :body} :parameters uinfo :identity}]
-                      (community/update-community (:query-fn _opts) uinfo id body))}}]])
+                      (community/update-community (:db-conn _opts) uinfo id body))}
+     :delete {:summary "delete community"
+              :middleware [[auth-middleware/wrap-restricted]]
+              :responses {200 {:body any?}}
+              :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                         (community/delete-community (:db-conn _opts) uinfo id))}}]
+   ])
 
 (derive :reitit.routes/api :reitit/routes)
 

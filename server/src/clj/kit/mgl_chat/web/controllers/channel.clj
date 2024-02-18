@@ -5,7 +5,7 @@
    [java.util UUID]))
 
 (defn new-channel
-  [conn params]
+  [conn uinfo params]
   (db/insert!
    conn
    :channels
