@@ -88,6 +88,7 @@
                       (community/update-community (:db-conn _opts) uinfo id body))}
      :delete {:summary "delete community"
               :middleware [[auth-middleware/wrap-restricted]]
+              :parameters {:path {:id string?}}
               :responses {200 {:body any?}}
               :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                          (community/delete-community (:db-conn _opts) uinfo id))}}]
@@ -106,7 +107,25 @@
            :parameters {:path {:id string?}}
            :responses {200 {:body any?}}
            :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
-                      (channel/query-channels (:db-conn _opts) id {}))}}]])
+                      (channel/query-channels (:db-conn _opts) id {}))}}]
+   ["/communities/:id/channels/:cid"
+    {:swagger {:tags ["channels"]}
+     :middleware [[(partial community/wrap-community _opts)]]
+     :put {:summary "update channel"
+           :middleware [[auth-middleware/wrap-restricted]]
+           :parameters {:body {:title string?}
+                        :path {:id string?
+                               :cid string?}}
+           :responses {200 {:body any?}}
+           :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
+                      (channel/update-channel (:db-conn _opts) cid body))}
+     :delete {:summary "delete channel"
+              :middleware [[auth-middleware/wrap-restricted]]
+              :parameters {:path {:id string?
+                                  :cid string?}}
+              :responses {200 {:body any?}}
+              :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
+                         (channel/delete-channel (:db-conn _opts) cid))}}]])
 
 (derive :reitit.routes/api :reitit/routes)
 
