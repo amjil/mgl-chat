@@ -78,54 +78,51 @@
                       (community/query-communities (:query-fn _opts) uinfo))}}]
    ["/communities/:id"
     {:swagger {:tags ["community"]}
-     :middleware [[(partial community/wrap-community _opts)]]
-     :put {:summary "update community"
-           :middleware [[auth-middleware/wrap-restricted]]
-           :parameters {:body {:title string?}
-                        :path {:id string?}}
-           :responses {200 {:body any?}}
-           :handler (fn [{{{id :id} :path body :body} :parameters uinfo :identity}]
-                      (community/update-community (:db-conn _opts) uinfo id body))}
-     :delete {:summary "delete community"
-              :middleware [[auth-middleware/wrap-restricted]]
-              :parameters {:path {:id string?}}
-              :responses {200 {:body any?}}
-              :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
-                         (community/delete-community (:db-conn _opts) uinfo id))}}]
-   ["/communities/:id/channels"
-    {:swagger {:tags ["channels"]}
-     :post {:summary "new channel"
-            :middleware [[auth-middleware/wrap-restricted]]
+     :middleware [[(partial community/wrap-community _opts)]
+                  [auth-middleware/wrap-restricted]]}
+    [""
+     {:put {:summary "update community"
             :parameters {:body {:title string?}
                          :path {:id string?}}
             :responses {200 {:body any?}}
             :handler (fn [{{{id :id} :path body :body} :parameters uinfo :identity}]
-                       {:status 200 :body
-                        (channel/new-channel (:db-conn _opts) uinfo (assoc body :comm_id id))})}
-     :get {:summary "get channels list"
-           :middleware [[auth-middleware/wrap-restricted]]
-           :parameters {:path {:id string?}}
-           :responses {200 {:body any?}}
-           :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
-                      (channel/query-channels (:db-conn _opts) id {}))}}]
-   ["/communities/:id/channels/:cid"
-    {:swagger {:tags ["channels"]}
-     :middleware [[(partial community/wrap-community _opts)]]
-     :put {:summary "update channel"
-           :middleware [[auth-middleware/wrap-restricted]]
-           :parameters {:body {:title string?}
-                        :path {:id string?
-                               :cid string?}}
-           :responses {200 {:body any?}}
-           :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
-                      (channel/update-channel (:db-conn _opts) cid body))}
-     :delete {:summary "delete channel"
-              :middleware [[auth-middleware/wrap-restricted]]
-              :parameters {:path {:id string?
-                                  :cid string?}}
-              :responses {200 {:body any?}}
-              :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
-                         (channel/delete-channel (:db-conn _opts) cid))}}]])
+                       (community/update-community (:db-conn _opts) uinfo id body))}
+      :delete {:summary "delete community"
+               :parameters {:path {:id string?}}
+               :responses {200 {:body any?}}
+               :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                          (community/delete-community (:db-conn _opts) uinfo id))}}]
+    ["/channels"
+     {:swagger {:tags ["community"]}
+      :middleware [[(partial channel/wrap-channel _opts)]]
+      :post {:summary "new channel"
+             :parameters {:body {:title string?}
+                          :path {:id string?}}
+             :responses {200 {:body any?}}
+             :handler (fn [{{{id :id} :path body :body} :parameters uinfo :identity}]
+                        {:status 200 :body
+                         (channel/new-channel (:db-conn _opts) uinfo (assoc body :comm_id id))})}
+      :get {:summary "get channels list"
+            :parameters {:path {:id string?}}
+            :responses {200 {:body any?}}
+            :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                       (channel/query-channels (:db-conn _opts) id {}))}}]
+    ["/channels/:cid"
+     {:swagger {:tags ["community"]}
+      :middleware [[(partial channel/wrap-channel _opts)]]
+      :put {:summary "update channel"
+            :parameters {:body {:title string?}
+                         :path {:id string?
+                                :cid string?}}
+            :responses {200 {:body any?}}
+            :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
+                       (channel/update-channel (:db-conn _opts) cid body))}
+      :delete {:summary "delete channel"
+               :parameters {:path {:id string?
+                                   :cid string?}}
+               :responses {200 {:body any?}}
+               :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
+                          (channel/delete-channel (:db-conn _opts) cid))}}]]])
 
 (derive :reitit.routes/api :reitit/routes)
 

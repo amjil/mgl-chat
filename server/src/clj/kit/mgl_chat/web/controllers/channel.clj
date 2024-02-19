@@ -33,3 +33,11 @@
    conn
    :channels
    (assoc params :comm_id id)))
+
+(defn wrap-channel
+  [opts handler]
+  (fn [{{{cid :cid} :path} :parameters :as ctx}]
+    (if-some [channel (db/find-one-by-keys (:db-conn opts) :channels {:id (UUID/fromString cid)})]
+      (handler (assoc ctx :channel channel))
+      {:status 404
+       :body {}})))
