@@ -5,6 +5,7 @@
     [kit.mgl-chat.web.controllers.auth :as auth]
     [kit.mgl-chat.web.controllers.channel :as channel]
     [kit.mgl-chat.web.controllers.health :as health]
+    [kit.mgl-chat.web.controllers.ws :as ws]
     [kit.mgl-chat.web.middleware.exception :as exception]
     [kit.mgl-chat.web.middleware.formats :as formats]
     [integrant.core :as ig]
@@ -109,20 +110,24 @@
                        (channel/query-channels (:db-conn _opts) id {}))}}]
     ["/channels/:cid"
      {:swagger {:tags ["community"]}
-      :middleware [[(partial channel/wrap-channel _opts)]]
-      :put {:summary "update channel"
-            :parameters {:body {:title string?}
-                         :path {:id string?
-                                :cid string?}}
-            :responses {200 {:body any?}}
-            :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
-                       (channel/update-channel (:db-conn _opts) cid body))}
-      :delete {:summary "delete channel"
-               :parameters {:path {:id string?
-                                   :cid string?}}
-               :responses {200 {:body any?}}
-               :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
-                          (channel/delete-channel (:db-conn _opts) cid))}}]]])
+      :middleware [[(partial channel/wrap-channel _opts)]]}
+     [""
+      {:put {:summary "update channel"
+             :parameters {:body {:title string?}
+                          :path {:id string?
+                                 :cid string?}}
+             :responses {200 {:body any?}}
+             :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
+                        (channel/update-channel (:db-conn _opts) cid body))}
+       :delete {:summary "delete channel"
+                :parameters {:path {:id string?
+                                    :cid string?}}
+                :responses {200 {:body any?}}
+                :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
+                           (channel/delete-channel (:db-conn _opts) cid))}}]
+     ["/message"
+      {:swagger {:tags ["community"]}
+       :get ws/handler}]]]])
 
 (derive :reitit.routes/api :reitit/routes)
 
