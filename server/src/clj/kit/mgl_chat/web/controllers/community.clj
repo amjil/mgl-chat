@@ -9,7 +9,7 @@
   (db/insert!
    conn
    :communities
-   (assoc params :user_id (UUID/fromString (:id uinfo))))
+   (assoc params :created_by (UUID/fromString (:id uinfo))))
   {})
 
 (defn delete-community
@@ -18,7 +18,8 @@
    conn
    :communities
    {:id (UUID/fromString id)
-    :user_id (UUID/fromString (:id uinfo))}))
+    :created_by (UUID/fromString (:id uinfo))})
+  {})
 
 (defn update-community
   [conn uinfo id params]
@@ -27,11 +28,18 @@
    :communities
    params
    {:id (UUID/fromString id)
-    :user_id (UUID/fromString (:id uinfo))}))
+    :created_by (UUID/fromString (:id uinfo))})
+  {})
 
 (defn query-communities
   [query-fn uinfo]
-  (query-fn :query-communities {:user_id (UUID/fromString (:id uinfo))}))
+  (query-fn :query-communities {:created_by (UUID/fromString (:id uinfo))}))
+
+(defn join
+  [conn uinfo id]
+  (db/insert! conn :memberships {:user_id (UUID/fromString (:id uinfo))
+                                 :comm_id (UUID/fromString id)})
+  {})
 
 (defn wrap-community 
   [opts handler]

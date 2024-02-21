@@ -58,7 +58,7 @@
      {:post {:summary "sign up."
              :parameters {:body {:email string?
                                  :password string?}}
-             :responses {200 {:body {:token string?}}}
+             :responses {200 {:body any?}}
              :handler (fn [{{:keys [body]} :parameters headers :headers addr :remote-addr}]
                         {:status 200 :body
                          (auth/signup (:db-conn _opts) (:token-secret _opts) body)})}}]]
@@ -93,6 +93,15 @@
                :responses {200 {:body any?}}
                :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                           (community/delete-community (:db-conn _opts) uinfo id))}}]
+    ["/join"
+     {:swagger {:tags ["community"]}
+      :post {:summary "join"
+             :parameters {:path {:id string?}}
+             :responses {200 {:body any?}}
+             :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                        {:status 200 :body
+                         (community/join (:db-conn _opts) uinfo id)})}}
+     ]
     ["/channels"
      {:swagger {:tags ["community"]}
       :middleware [[(partial channel/wrap-channel _opts)]]

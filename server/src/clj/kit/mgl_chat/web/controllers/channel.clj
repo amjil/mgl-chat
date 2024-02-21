@@ -17,7 +17,8 @@
   (db/delete!
    conn
    :channels
-   {:id (UUID/fromString id)}))
+   {:id (UUID/fromString id)})
+  {})
 
 (defn update-channel
   [conn id params]
@@ -25,7 +26,8 @@
    conn
    :channels
    params
-   {:id (UUID/fromString id)}))
+   {:id (UUID/fromString id)})
+  {})
 
 (defn query-channels
   [conn id params]
