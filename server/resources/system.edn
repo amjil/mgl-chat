@@ -38,6 +38,8 @@
  :reitit.routes/api
  {:base-path "/api"
   :env #ig/ref :system/env
+  :db-conn #ig/ref :db.sql/connection
+  :token-secret #or [#env TOKEN_SECRET "mysupersecretkey"]
   :query-fn #ig/ref :db.sql/query-fn}
 
  :router/routes

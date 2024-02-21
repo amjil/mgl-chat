@@ -1,19 +1,19 @@
 (ns kit.mgl-chat.web.routes.api
   (:require
-    [kit.mgl-chat.web.middleware.auth :as auth-middleware]
-    [kit.mgl-chat.web.controllers.community :as community]
-    [kit.mgl-chat.web.controllers.auth :as auth]
-    [kit.mgl-chat.web.controllers.channel :as channel]
-    [kit.mgl-chat.web.controllers.health :as health]
-    [kit.mgl-chat.web.controllers.ws :as ws]
-    [kit.mgl-chat.web.middleware.exception :as exception]
-    [kit.mgl-chat.web.middleware.formats :as formats]
-    [integrant.core :as ig]
-    [reitit.coercion.malli :as malli]
-    [reitit.ring.coercion :as coercion]
-    [reitit.ring.middleware.muuntaja :as muuntaja]
-    [reitit.ring.middleware.parameters :as parameters]
-    [reitit.swagger :as swagger]))
+   [kit.mgl-chat.web.middleware.auth :as auth-middleware]
+   [kit.mgl-chat.web.controllers.community :as community]
+   [kit.mgl-chat.web.controllers.auth :as auth]
+   [kit.mgl-chat.web.controllers.channel :as channel]
+   [kit.mgl-chat.web.controllers.health :as health]
+   [kit.mgl-chat.web.controllers.ws :as ws]
+   [kit.mgl-chat.web.middleware.exception :as exception]
+   [kit.mgl-chat.web.middleware.formats :as formats]
+   [integrant.core :as ig]
+   [reitit.coercion.malli :as malli]
+   [reitit.ring.coercion :as coercion]
+   [reitit.ring.middleware.muuntaja :as muuntaja]
+   [reitit.ring.middleware.parameters :as parameters]
+   [reitit.swagger :as swagger]))
 
 (def route-data
   {:coercion   malli/coercion
@@ -127,7 +127,8 @@
                            (channel/delete-channel (:db-conn _opts) cid))}}]
      ["/message"
       {:swagger {:tags ["community"]}
-       :get ws/handler}]]]])
+       :get ws/handler}]]]
+       ])
 
 (derive :reitit.routes/api :reitit/routes)
 
