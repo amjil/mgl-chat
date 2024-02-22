@@ -139,14 +139,22 @@
                 :responses {200 {:body any?}}
                 :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
                            (channel/delete-channel (:db-conn _opts) cid))}}]
-     ["/message"
+     ["/messages"
       {:post {:summary "send message"
               :parameters {:body {:content string?}
                            :path {:id string?
                                   :cid string?}}
               :responses {200 {:body any?}}
               :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
-                         (channel/message (:db-conn _opts) uinfo id cid body))}}]]]])
+                         (channel/send-message (:db-conn _opts) uinfo id cid body))}
+       :get {:summary "query messages"
+             :parameters {:query {:created_at inst?}
+                          :path {:id string?
+                                 :cid string?}}
+              :responses {200 {:body any?}}
+              :handler (fn [{{{cid :cid} :path params :query} :parameters}]
+                         (channel/query-message (:db-conn _opts) cid params))
+             }}]]]])
 
 (derive :reitit.routes/api :reitit/routes)
 
