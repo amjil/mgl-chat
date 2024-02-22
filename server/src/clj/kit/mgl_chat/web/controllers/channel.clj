@@ -45,3 +45,13 @@
       (handler (assoc ctx :channel channel))
       {:status 404
        :body {}})))
+
+(defn message 
+  [conn uinfo cid params]
+  (db/insert! 
+   conn
+   :messages
+   {:from_user_id (UUID/fromString (:id uinfo))
+    :channel_id (UUID/fromString cid)
+    :content (:content params)})
+  {})

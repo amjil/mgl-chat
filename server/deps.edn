@@ -29,6 +29,7 @@
 
            ;; kit Libs
            io.github.kit-clj/kit-core {:mvn/version "1.0.6"}
+           io.github.kit-clj/kit-quartz {:mvn/version "1.0.3"}
            io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
            io.github.kit-clj/kit-sql-conman {:mvn/version "1.0.5"}
            io.github.kit-clj/kit-sql-migratus {:mvn/version "1.0.2"}

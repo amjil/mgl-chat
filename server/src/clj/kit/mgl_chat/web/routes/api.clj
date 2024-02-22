@@ -138,7 +138,16 @@
                                     :cid string?}}
                 :responses {200 {:body any?}}
                 :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
-                           (channel/delete-channel (:db-conn _opts) cid))}}]]]])
+                           (channel/delete-channel (:db-conn _opts) cid))}}]
+     ["message"
+      {:post {:summary "send message"
+              :parameters {:body {:content string?}
+                           :path {:id string?
+                                  :cid string?}}
+              :responses {200 {:body any?}}
+              :handler (fn [{{{cid :cid} :path body :body} :parameters uinfo :identity}]
+                         (channel/message (:db-conn _opts) uinfo cid body))}
+       }]]]])
 
 (derive :reitit.routes/api :reitit/routes)
 

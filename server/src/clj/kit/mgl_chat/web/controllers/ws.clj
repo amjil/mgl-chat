@@ -4,7 +4,8 @@
    [kit.mgl-chat.web.utils.token :as token]
    [cheshire.core :as cheshire]
    [clojure.tools.logging :as log]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [kit.mgl-chat.web.utils.db :as db]))
 
 (declare send-response
          handle-message
@@ -37,7 +38,6 @@
   [data channel]
   (undertow-ws/send data channel))
 
-
 (defn handle-request [opts userinfo message]
   (when-let [response (handle-message opts userinfo message)]
     (-> response
@@ -45,5 +45,17 @@
         (send-response (:channel opts)))))
 
 (defmulti handle-message
+  ;; {:type xxxx :data}
   (fn [_ _ msg]
     (:type msg)))
+
+(defmethod handle-message
+  "msg"
+  [_ _ message]
+  (log/warn "handle-message" message)
+  {})
+
+;; (defn send-notifications 
+;;   [uid message]
+;;   (if-some [channel (get @channels uid)]
+;;     ))
