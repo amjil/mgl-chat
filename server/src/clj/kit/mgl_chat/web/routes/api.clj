@@ -62,6 +62,13 @@
              :handler (fn [{{:keys [body]} :parameters headers :headers addr :remote-addr}]
                         {:status 200 :body
                          (auth/signup (:db-conn _opts) (:token-secret _opts) body)})}}]]
+   ["/message"
+    {:swagger {:tags ["message"]}
+     :get {:summary "message"
+           :parameters {:query {:token string?}}
+           :responses {200 {:body any?}}
+           :handler #(ws/handler (select-keys _opts [:db-conn :query-fn :token-secret]) %)}}]
+
    ["/communities"
     {:swagger {:tags ["community"]}
      :post {:summary "new community"
@@ -79,10 +86,10 @@
                       (community/query-communities (:query-fn _opts) uinfo))}}]
    ["/communities/:id"
     {:swagger {:tags ["community"]}
-     :middleware [[(partial community/wrap-community _opts)]]}
+     :middleware [[(partial community/wrap-community _opts)]
+                  [auth-middleware/wrap-restricted]]}
     [""
-     {:middleware [[auth-middleware/wrap-restricted]]
-      :put {:summary "update community"
+     {:put {:summary "update community"
             :parameters {:body {:title string?}
                          :path {:id string?}}
             :responses {200 {:body any?}}
@@ -95,7 +102,6 @@
                           (community/delete-community (:db-conn _opts) uinfo id))}}]
     ["/join"
      {:swagger {:tags ["community"]}
-      :middleware [[auth-middleware/wrap-restricted]]
       :post {:summary "join"
              :parameters {:path {:id string?}}
              :responses {200 {:body any?}}
@@ -104,7 +110,6 @@
                          (community/join (:db-conn _opts) uinfo id)})}}]
     ["/channels"
      {:swagger {:tags ["community"]}
-      :middleware [[auth-middleware/wrap-restricted]]
       :post {:summary "new channel"
              :parameters {:body {:title string?}
                           :path {:id string?}}
@@ -121,8 +126,7 @@
      {:swagger {:tags ["community"]}
       :middleware [[(partial channel/wrap-channel _opts)]]}
      [""
-      {:middleware [[auth-middleware/wrap-restricted]]
-       :put {:summary "update channel"
+      {:put {:summary "update channel"
              :parameters {:body {:title string?}
                           :path {:id string?
                                  :cid string?}}
@@ -134,15 +138,7 @@
                                     :cid string?}}
                 :responses {200 {:body any?}}
                 :handler (fn [{{{id :id cid :cid} :path} :parameters uinfo :identity}]
-                           (channel/delete-channel (:db-conn _opts) cid))}}]
-     ["/message"
-      {:swagger {:tags ["community"]}
-       :get {:summary "message"
-             :parameters {:path {:id string?
-                                 :cid string?}
-                          :query {:token string?}}
-             :responses {200 {:body any?}}
-             :handler ws/handler}}]]]])
+                           (channel/delete-channel (:db-conn _opts) cid))}}]]]])
 
 (derive :reitit.routes/api :reitit/routes)
 
