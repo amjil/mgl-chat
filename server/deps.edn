@@ -36,7 +36,7 @@
            ;; DB
            org.postgresql/postgresql {:mvn/version "42.3.4"}
            org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}
-           hiccup/hiccup {:mvn/version "2.0.0-alpha2"}}
+           luminus/ring-ttl-session {:mvn/version "0.3.3"}}
  :aliases {:build {:deps {io.github.clojure/tools.build {:git/sha "24f2894"
                                                          :git/tag "v0.9.5" :git/url "https://github.com/clojure/tools.build.git"}}
                    :ns-default build}
@@ -51,8 +51,7 @@
                                 ring/ring-devel                 {:mvn/version "1.10.0"}
                                 ring/ring-mock                  {:mvn/version "0.4.0"}
                                 io.github.kit-clj/kit-generator {:mvn/version "0.1.9"}
-                                org.clojure/tools.namespace     {:mvn/version "1.4.4"}
-                                }
+                                org.clojure/tools.namespace     {:mvn/version "1.4.4"}}
                   :extra-paths ["env/dev/clj" "env/dev/resources" "test/clj"]}
            :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}
                    :main-opts  ["-m" "nrepl.cmdline" "-i"]}
@@ -75,5 +74,4 @@
                   :exec-fn      cognitect.test-runner.api/test
                   :extra-paths ["env/dev/clj" "env/dev/resources" "env/test/resources" "test/clj"]
                   :main-opts   ["-e" "(require 'pjstadig.humane-test-output) (pjstadig.humane-test-output/activate!)"
-                                "-m" "cognitect.test-runner"]}}
- }
+                                "-m" "cognitect.test-runner"]}}}

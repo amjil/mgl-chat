@@ -1,20 +1,19 @@
 (ns kit.mgl-chat.core
   (:require
-    [clojure.tools.logging :as log]
-    [integrant.core :as ig]
-    [kit.mgl-chat.config :as config]
-    [kit.mgl-chat.env :refer [defaults]]
+   [clojure.tools.logging :as log]
+   [integrant.core :as ig]
+   [kit.mgl-chat.config :as config]
+   [kit.mgl-chat.env :refer [defaults]]
 
     ;; Edges       
-    [kit.edge.server.undertow]
-    [kit.mgl-chat.web.handler]
+   [kit.edge.server.undertow]
+   [kit.mgl-chat.web.handler]
 
     ;; Routes
-    [kit.mgl-chat.web.routes.api]
-    
-    [kit.edge.db.sql.conman] 
-    [kit.edge.db.sql.migratus] 
-    [kit.mgl-chat.web.routes.ui])
+   [kit.mgl-chat.web.routes.api]
+
+   [kit.edge.db.sql.conman]
+   [kit.edge.db.sql.migratus])
   (:gen-class))
 
 ;; log uncaught exceptions in threads
