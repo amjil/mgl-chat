@@ -55,7 +55,7 @@
   (log/warn "handle-message" message)
   {})
 
-;; (defn send-notifications 
-;;   [uid message]
-;;   (if-some [channel (get @channels uid)]
-;;     ))
+(defn send-notification 
+  [uid message]
+  (if-some [channel (get @channels uid)]
+    (send-response {:type :msg message})))

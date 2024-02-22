@@ -145,8 +145,8 @@
                            :path {:id string?
                                   :cid string?}}
               :responses {200 {:body any?}}
-              :handler (fn [{{{cid :cid} :path body :body} :parameters uinfo :identity}]
-                         (channel/message (:db-conn _opts) uinfo cid body))}}]]]])
+              :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
+                         (channel/message (:db-conn _opts) uinfo id cid body))}}]]]])
 
 (derive :reitit.routes/api :reitit/routes)
 

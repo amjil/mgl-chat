@@ -48,7 +48,7 @@
        :body {}})))
 
 (defn message 
-  [conn uinfo cid params]
+  [conn uinfo id cid params]
   (db/insert! 
    conn
    :messages
@@ -57,6 +57,7 @@
     :content (:content params)})
   (job/send-notification 
    {:from_user_id (:id uinfo)
+    :community_id id
     :channel_id cid
     :content (:content params)})
   {})
