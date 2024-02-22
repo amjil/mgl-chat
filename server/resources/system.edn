@@ -56,5 +56,4 @@
  :db.sql/connection #profile {:dev {:jdbc-url "jdbc:postgresql://localhost:5432/chat_dev?user=appuser&password=appuer"},
                               :test {:jdbc-url "jdbc:postgresql://localhost:5432/chat_dev?user=appuser&password=appuer"},
                               :prod {:jdbc-url #env JDBC_URL}}
- :reitit.routes/ui {:base-path "",
-                    :env #ig/ref :system/env}}
+ }

@@ -1,6 +1,7 @@
 (ns kit.mgl-chat.web.controllers.channel
   (:require
-   [kit.mgl-chat.web.utils.db :as db])
+   [kit.mgl-chat.web.utils.db :as db]
+   [kit.mgl-chat.web.utils.job :as job])
   (:import
    [java.util UUID]))
 
@@ -53,5 +54,9 @@
    :messages
    {:from_user_id (UUID/fromString (:id uinfo))
     :channel_id (UUID/fromString cid)
+    :content (:content params)})
+  (job/send-notification 
+   {:from_user_id (:id uinfo)
+    :channel_id cid
     :content (:content params)})
   {})

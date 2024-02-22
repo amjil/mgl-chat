@@ -21,6 +21,8 @@
 
            ;; Logging
            ch.qos.logback/logback-classic {:mvn/version "1.4.11"}
+           
+           jarohen/chime {:mvn/version "0.3.3"}
 
            ;; Data coercion
            luminus-transit/luminus-transit {:mvn/version "0.1.6"
@@ -29,7 +31,6 @@
 
            ;; kit Libs
            io.github.kit-clj/kit-core {:mvn/version "1.0.6"}
-           io.github.kit-clj/kit-quartz {:mvn/version "1.0.3"}
            io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
            io.github.kit-clj/kit-sql-conman {:mvn/version "1.0.5"}
            io.github.kit-clj/kit-sql-migratus {:mvn/version "1.0.2"}
