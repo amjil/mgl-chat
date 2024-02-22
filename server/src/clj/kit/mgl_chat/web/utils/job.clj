@@ -2,6 +2,7 @@
   (:require
    [chime.core :as chime]
    [kit.mgl-chat.web.utils.db :as db]
+   [kit.mgl-chat.web.controllers.ws :as ws]
    [clojure.tools.logging :as log])
   (:import 
    [java.time Instant]
@@ -17,7 +18,7 @@
                                     {:comm_id (UUID/fromString (:community_id message))}
                                     {:columns [:user_id]})]
          (doall
-          (map #(ws/send-notification % (:content message)))))
+          (map #(ws/send-notification % (:content message)) users)))
        (log/warn "Chiming at" time)))))
 
 

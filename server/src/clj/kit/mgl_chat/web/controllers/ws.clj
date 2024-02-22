@@ -57,5 +57,5 @@
 
 (defn send-notification 
   [uid message]
-  (if-some [channel (get @channels uid)]
-    (send-response {:type :msg message})))
+  (when-let [channel (get @channels uid)]
+    (send-response {:type :message :msg message} channel)))
