@@ -9,7 +9,9 @@
   (db/insert!
    conn
    :channels
-   params)
+   (assoc params 
+          :comm_id (UUID/fromString (:comm_id params))
+          :created_by (UUID/fromString (:id uinfo))))
   {})
 
 (defn delete-channel

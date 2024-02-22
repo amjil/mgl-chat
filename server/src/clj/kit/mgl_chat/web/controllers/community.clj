@@ -41,7 +41,7 @@
                                  :comm_id (UUID/fromString id)})
   {})
 
-(defn wrap-community 
+(defn wrap-community
   [opts handler]
   (fn [{{{id :id} :path} :parameters :as ctx}]
     (if-some [community (db/find-one-by-keys (:db-conn opts) :communities {:id (UUID/fromString id)})]

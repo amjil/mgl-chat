@@ -100,11 +100,9 @@
              :responses {200 {:body any?}}
              :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                         {:status 200 :body
-                         (community/join (:db-conn _opts) uinfo id)})}}
-     ]
+                         (community/join (:db-conn _opts) uinfo id)})}}]
     ["/channels"
      {:swagger {:tags ["community"]}
-      :middleware [[(partial channel/wrap-channel _opts)]]
       :post {:summary "new channel"
              :parameters {:body {:title string?}
                           :path {:id string?}}
@@ -136,8 +134,7 @@
                            (channel/delete-channel (:db-conn _opts) cid))}}]
      ["/message"
       {:swagger {:tags ["community"]}
-       :get ws/handler}]]]
-       ])
+       :get ws/handler}]]]])
 
 (derive :reitit.routes/api :reitit/routes)
 
