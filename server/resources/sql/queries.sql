@@ -13,5 +13,11 @@ select a.*,
 select a.*, b.screen_name
     from messages a 
     left join users b on a.from_user_id = b.id
-where a.created_at < :created_at
+where 1 = 1
+/*~ (if (true? (:newer? params)) */
+and a.created_at > :created_at
+/*~*/
+and a.created_at < :created_at
+/*~ ) ~*/
+
 limit 20

@@ -148,7 +148,9 @@
               :handler (fn [{{{id :id cid :cid} :path body :body} :parameters uinfo :identity}]
                          (channel/send-message (:db-conn _opts) uinfo id cid body))}
        :get {:summary "query messages"
-             :parameters {:query {:created_at inst?}
+             :parameters {:query [:map 
+                                  [:created_at inst?]
+                                  [:newer? {:optional true} boolean?]]
                           :path {:id string?
                                  :cid string?}}
               :responses {200 {:body any?}}
