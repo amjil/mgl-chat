@@ -1,0 +1,131 @@
+(ns mchat.services.ws
+  (:require 
+   ["dart:convert" :as convert]
+   ["dart:async" :as async]
+   ["package:web_socket_channel/web_socket_channel.dart" :as ws]
+   [clojure.string :as str]))
+
+(defonce state
+  (atom {:channel nil
+         :connected? false
+         :url nil
+         :retry 0
+         :listeners {}       ;; {event-type handler-fn}
+         :heartbeat-timer nil
+         :manual-close? false}))
+
+
+(defn log [& xs]
+  (dart:core/print (str/join " " xs)))
+
+(defn json-encode [text]
+  (convert/jsonEncode text))
+  
+(defn json-decode [text]
+  (convert/jsonDecode text))
+  
+(defn dispatch! [msg]
+  (let [{:keys [listeners]} @state
+        evt-type (get msg "type")
+        handler  (get listeners evt-type)]
+    (log "dispatching message:" msg)
+    (log "message type:" evt-type)
+    (when handler
+      (handler msg))))
+      
+(defn add-listener!
+  "register event handler: event-type -> handler-fn"
+  [event-type handler-fn]
+  (swap! state update :listeners assoc event-type handler-fn))
+  
+(defn send! [obj]
+  (when (:connected? @state)
+    (let [msg (json-encode obj)
+          sink (.-sink (:channel @state))]
+      (.add sink msg))))
+     
+(defn start-heartbeat! []
+  (let [timer (async/Timer.periodic
+               (Duration. .seconds 30)
+               (fn [_]
+                 (when (:connected? @state)
+                   (send! {"type" "ping"}))))]
+    (swap! state assoc :heartbeat-timer timer)))
+
+(defn stop-heartbeat! []
+  (when-let [t (:heartbeat-timer @state)]
+    (.cancel t)
+    (swap! state assoc :heartbeat-timer nil)))
+    
+(declare connect!)
+    
+(defn schedule-reconnect! []
+  (let [{:keys [retry url manual-close?]} @state]
+    (when-not manual-close?
+      (let [next-retry (min 30 (+ retry 5))]
+        (log "Reconnect in" next-retry "sec...")
+        (swap! state assoc :retry next-retry)
+        (async/Timer
+         (Duration. .seconds next-retry)
+         (fn [] (connect! url)))))))
+         
+(defn connect! [url]
+  (log "Connecting to" url)
+  (swap! state assoc :url url :manual-close? false)
+  (try
+    (let [channel (ws/WebSocketChannel.connect (dart:core/Uri.parse url))]
+      (swap! state assoc
+             :channel channel
+             :connected? true
+             :retry 0)
+
+      (log "WS Connected.")
+
+      ;; start heartbeat
+      (start-heartbeat!)
+
+      ;; listen for messages
+      (.listen
+       (.-stream channel)
+       (fn [raw]
+         (when-let [msg (json-decode raw)]
+           (dispatch! msg)))
+
+       ;; On Error
+       .onError
+       (fn [err]
+         (log "WS Error:" err))
+
+       ;; On Done
+       .onDone
+       (fn []
+         (log "WS Closed.")
+         (swap! state assoc :connected? false)
+         (stop-heartbeat!))))
+    ;;  (schedule-reconnect!))))
+
+
+    (catch Exception e
+      (log "WS Connect error:" e))))
+    ;;   (schedule-reconnect!))))
+    
+
+(defn close! []
+  (swap! state assoc :manual-close? true)
+  (stop-heartbeat!)
+  (when-let [c (:channel @state)]
+    (.close (.-sink c)))
+  (swap! state assoc :connected? false)
+  (log "WS manually closed."))
+  
+;; (client/connect! "wss://yourserver/ws")
+
+;; (client/send! {:type "message"
+;;                :text "Hello!"})
+
+;; (client/add-listener!
+;;  "message"
+;;  (fn [msg]
+;;    (print "recieved:" msg)))
+
+;; (client/close!)

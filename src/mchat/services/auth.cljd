@@ -1,0 +1,41 @@
+(ns mchat.services.auth
+  "High level auth helpers that delegate to rest."
+  (:require
+   [mchat.services.rest :as rest]
+   [cljd-utils.pref :as pref]))
+
+(def ^:private default-login-path "auth/session/login")
+
+(defn login!
+  "Call rest login endpoint with the provided credentials."
+  [{:keys [email password otp extra-body decode? path query]
+    :as opts}]
+  (when-not (and (some? email) (some? password))
+    (throw (ex-info "email/password required"
+                    {:provided-keys (keys opts)})))
+  (let [body (cond-> {"email" email
+                      "password" password}
+               otp (assoc :otp otp)
+               (map? extra-body) (merge extra-body))
+        request {:config (:config opts)
+                 :path (or path default-login-path)
+                 :method :post
+                 :headers (:headers opts)
+                 :token (:token opts)
+                 :timeout-ms (:timeout-ms opts)
+                 :query query
+                 :body body
+                 :json? true
+                 :decode? (if (contains? opts :decode?) decode? true)}]
+    (-> (rest/rest-request! request)
+        (.then (fn [x]
+                 (when (= 200 (:status x))
+                   (let [body (:body x)
+                         user-id (get body "user_id")
+                         token (get body "token")]
+                     (dart:core/print (str "login success ...."))
+                     (pref/set-value {:key "user-id" :type :string :value user-id})
+                     (pref/set-value {:key "token" :type :string :value token}))))))))
+                 
+
+ 

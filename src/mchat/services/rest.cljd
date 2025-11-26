@@ -1,0 +1,147 @@
+(ns mchat.services.rest
+  "Helpers for talking to the service via HTTP."
+  (:require
+   ["dart:convert" :as convert]
+   ["dart:core" :as core]
+   ["package:http/http.dart" :as http]))
+
+
+(def ^:private default-rest-timeout-ms 15000)
+
+(def default-config
+  "Default endpoints/timeouts. Override with `merge` when wiring real hosts."
+  {:rest-base-url "https://mchat.chat/api/"
+   :rest-timeout-ms default-rest-timeout-ms})
+
+(defn with-config
+  "Merge `overrides` into `default-config` for convenience."
+  [overrides]
+  (merge default-config (or overrides {})))
+
+(defn- ensure-bearer-token [token]
+  (when token
+    (let [token-str (str token)]
+      (if (.startsWith token-str "Bearer ")
+        token-str
+        (str "Bearer " token-str)))))
+
+(defn- combine-path [base path]
+  (let [base (or base "")
+        path (or path "")]
+    (cond
+      (empty? base) path
+      (empty? path) base
+      (.endsWith base "/")
+      (if (.startsWith path "/")
+        (str base (subs path 1))
+        (str base path))
+      (.startsWith path "/") (str base path)
+      :else (str base "/" path))))
+
+(defn- encode-query [query]
+  (when (seq query)
+    (letfn [(kv->pair [[k v]]
+              (let [k* (if (keyword? k) (name k) (str k))
+                    v* (if (keyword? v) (name v) (str v))]
+                (str
+                 (core/Uri.encodeQueryComponent k*)
+                 "="
+                 (core/Uri.encodeQueryComponent v*))))]
+      (reduce
+       (fn [acc pair]
+         (if (empty? acc)
+           pair
+           (str acc "&" pair)))
+       ""
+       (map kv->pair query)))))
+
+(defn- build-url [{:keys [base path query]}]
+  (let [final (combine-path base path)
+        query-string (encode-query query)]
+    (if (seq query-string)
+      (str final "?" query-string)
+      final)))
+
+(defn- build-headers [{:keys [headers token json?]}]
+  (let [base {"Accept" "application/json"}
+        merged (if headers (merge base headers) base)
+        merged (if (and json? (not (contains? merged "Content-Type")))
+                 (assoc merged "Content-Type" "application/json")
+                 merged)]
+    (if-let [with-token (ensure-bearer-token token)]
+      (assoc merged "Authorization" with-token)
+      merged)))
+
+(defn- json-like? [body]
+  (or (map? body)
+      (vector? body)
+      (sequential? body)))
+
+(defn- maybe-json-encode [body]
+  (cond
+    (nil? body) nil
+    (string? body) body
+    (json-like? body) (convert/jsonEncode body)
+    :else body))
+
+(defn- schedule-timeout [future millis]
+  (.timeout future (core/Duration .milliseconds millis)))
+
+(defn rest-request!
+  "Perform a REST request to mchat.chat.
+
+   Returns a Future that resolves to {:status ... :headers ... :body ... :raw ...}."
+  [{:keys [config path query method headers token body json? timeout-ms decode?]
+    :or {method :get decode? true}
+    :as opts}]
+  (let [{:keys [rest-base-url rest-timeout-ms]}
+        (merge default-config (or config {}))
+        url (build-url {:base rest-base-url :path path :query query})
+        uri (core/Uri.parse url)
+        effective-json? (boolean (or json? (json-like? body)))
+        request-headers (build-headers {:headers headers
+                                        :token token
+                                        :json? (and body effective-json?)})
+        payload (maybe-json-encode body)
+        timeout (long (or timeout-ms rest-timeout-ms default-rest-timeout-ms))
+        req-fn (case method
+                 :get #(http/get uri .headers request-headers)
+                 :delete #(if payload
+                            (http/delete uri
+                                         .headers request-headers
+                                         .body payload)
+                            (http/delete uri .headers request-headers))
+                 :post #(if payload
+                          (http/post uri
+                                     .headers request-headers
+                                     .body payload)
+                          (http/post uri .headers request-headers))
+                 :put #(if payload
+                         (http/put uri
+                                   .headers request-headers
+                                   .body payload)
+                         (http/put uri .headers request-headers))
+                 :patch #(if payload
+                           (http/patch uri
+                                       .headers request-headers
+                                       .body payload)
+                           (http/patch uri .headers request-headers))
+                 (throw (ex-info "Unsupported HTTP method" {:method method :opts opts})))
+        response-future (schedule-timeout (req-fn) timeout)]
+    (.then response-future
+           (fn [resp]
+             (let [_body (.-body resp)
+                   parsed (if (and decode?
+                                   (string? _body)
+                                   (pos? (count _body)))
+                            (try
+                              (convert/jsonDecode _body)
+                              (catch Exception _
+                                _body))
+                            _body)]
+               {:status (.-statusCode resp)
+                :headers (.-headers resp)
+                :body parsed
+                :raw-body _body
+                :raw resp})))))
+

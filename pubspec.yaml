@@ -37,7 +37,8 @@ dependencies:
   http: ^1.6.0
   web_socket_channel: ^3.0.3
   mongol: ^9.0.0
-  mongol_code: ^1.0.3
+  mongol_code: ^1.0.4
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
