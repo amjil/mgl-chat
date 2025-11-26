@@ -1,0 +1,9 @@
+(ns mchat.services.msg
+  (:require
+   [mchat.services.utils :as utils]
+   [mchat.services.ws :as ws]))
+
+(defn ping-msg []
+  (ws/send!
+   {"type" "Ping"
+    "data" (utils/current-time-ms)}))

@@ -1,0 +1,4 @@
+(ns mchat.services.utils)
+
+(defn current-time-ms []
+  (.millisecondsSinceEpoch (DateTime/now)))

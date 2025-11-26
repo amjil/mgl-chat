@@ -1,0 +1,11 @@
+(ns mchat.services.handler
+  (:require
+   [mchat.services.utils :as utils]
+   [mchat.services.ws :as ws]))
+
+(defn handle-pong [msg]
+  (dart:core/print (str "pong received: " (pr-str msg))))
+
+(defn register-handlers! []
+  (ws/add-listener! "Pong" handle-pong))
+
